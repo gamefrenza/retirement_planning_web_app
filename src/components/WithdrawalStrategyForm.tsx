@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import { useRetirement } from '../context/RetirementContext';
 import { WithdrawalStrategy, WithdrawalRule } from '../types';
 
-const WithdrawalStrategyForm: React.FC = () => {
+const WithdrawalStrategyForm = (): JSX.Element => {
   const { withdrawalStrategy, setWithdrawalStrategy } = useRetirement();
   
-  const [rules, setRules] = useState(withdrawalStrategy.rules);
-  const [defaultRate, setDefaultRate] = useState(withdrawalStrategy.defaultRate);
+  const [rules, setRules] = useState<WithdrawalRule[]>(withdrawalStrategy.rules);
+  const [defaultRate, setDefaultRate] = useState<number>(withdrawalStrategy.defaultRate);
   
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     
     // Sort rules by threshold in descending order
-    const sortedRules = [...rules].sort((a, b) => b.marketReturnThreshold - a.marketReturnThreshold);
+    const sortedRules = [...rules].sort((a, b) => b.threshold - a.threshold);
     
     // Create new strategy
     const newStrategy: WithdrawalStrategy = {
@@ -24,15 +24,15 @@ const WithdrawalStrategyForm: React.FC = () => {
     setWithdrawalStrategy(newStrategy);
   };
   
-  const handleAddRule = () => {
-    setRules([...rules, { marketReturnThreshold: 0, withdrawalRate: 3 }]);
+  const handleAddRule = (): void => {
+    setRules([...rules, { threshold: 0, rate: 3 }]);
   };
   
-  const handleRemoveRule = (index: number) => {
-    setRules(rules.filter((_: WithdrawalRule, i: number) => i !== index));
+  const handleRemoveRule = (index: number): void => {
+    setRules(rules.filter((_, i) => i !== index));
   };
   
-  const handleRuleChange = (index: number, field: keyof WithdrawalRule, value: number) => {
+  const handleRuleChange = (index: number, field: keyof WithdrawalRule, value: number): void => {
     const newRules = [...rules];
     newRules[index] = { ...newRules[index], [field]: value };
     setRules(newRules);
@@ -49,7 +49,7 @@ const WithdrawalStrategyForm: React.FC = () => {
             Define rules for withdrawal rates based on market return thresholds. Rules are applied in order from highest to lowest threshold.
           </p>
           
-          {rules.map((rule: WithdrawalRule, index: number) => (
+          {rules.map((rule, index) => (
             <div key={index} className="flex flex-wrap items-end gap-4 mb-4 p-4 border border-gray-200 rounded-md">
               <div>
                 <label className="block text-gray-700 font-medium mb-2">
@@ -57,8 +57,8 @@ const WithdrawalStrategyForm: React.FC = () => {
                 </label>
                 <input
                   type="number"
-                  value={rule.marketReturnThreshold}
-                  onChange={(e) => handleRuleChange(index, 'marketReturnThreshold', Number(e.target.value))}
+                  value={rule.threshold}
+                  onChange={(e) => handleRuleChange(index, 'threshold', Number(e.target.value))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   step="0.1"
                 />
@@ -70,8 +70,8 @@ const WithdrawalStrategyForm: React.FC = () => {
                 </label>
                 <input
                   type="number"
-                  value={rule.withdrawalRate}
-                  onChange={(e) => handleRuleChange(index, 'withdrawalRate', Number(e.target.value))}
+                  value={rule.rate}
+                  onChange={(e) => handleRuleChange(index, 'rate', Number(e.target.value))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   step="0.1"
                   min="0"

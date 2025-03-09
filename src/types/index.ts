@@ -1,3 +1,6 @@
+// Export React-specific types
+export * from './react-app';
+
 // Asset allocation types
 export interface AssetAllocation {
   cash: number;
@@ -13,14 +16,14 @@ export interface RetirementAssets {
 // Market data types
 export interface MarketData {
   year: number;
-  sp500Return: number;
-  inflationRate: number;
+  sp500Return: number | null;
+  inflationRate: number | null;
 }
 
 // Withdrawal strategy types
 export interface WithdrawalRule {
-  marketReturnThreshold: number;
-  withdrawalRate: number;
+  threshold: number;
+  rate: number;
 }
 
 export interface WithdrawalStrategy {
@@ -31,13 +34,23 @@ export interface WithdrawalStrategy {
 // Withdrawal calculation types
 export interface WithdrawalCalculation {
   year: number;
-  portfolioValue: number;
   marketReturn: number;
   inflationRate: number;
   withdrawalRate: number;
   withdrawalAmount: number;
-  remainingPortfolio: number;
-  cashWithdrawal: number;
-  bondsWithdrawal: number;
-  equityWithdrawal: number;
+  portfolioValue: number;
+  inflationAdjustedWithdrawal: number;
+}
+
+// Context types
+export interface RetirementContextType {
+  assets: RetirementAssets;
+  setAssets: (assets: RetirementAssets) => void;
+  withdrawalStrategy: WithdrawalStrategy;
+  setWithdrawalStrategy: (strategy: WithdrawalStrategy) => void;
+  withdrawalCalculations: WithdrawalCalculation[];
+  calculateWithdrawals: (years: number) => void;
+  marketData: MarketData[];
+  isLoading: boolean;
+  error: string | null;
 } 

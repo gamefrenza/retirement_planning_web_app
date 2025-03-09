@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useRetirement } from '../context/RetirementContext';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const MarketDataChart: React.FC = () => {
+const MarketDataChart = (): JSX.Element => {
   const { marketData, isLoading } = useRetirement();
-  const [timeRange, setTimeRange] = useState(10); // Default to 10 years
+  const [timeRange, setTimeRange] = useState<number>(10); // Default to 10 years
 
   if (isLoading || marketData.length === 0) {
     return (

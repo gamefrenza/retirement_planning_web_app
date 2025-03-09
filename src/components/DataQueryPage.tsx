@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { updateMarketData } from '../utils/api';
 
-const DataQueryPage: React.FC = () => {
-  const [startYear, setStartYear] = useState(2004);
-  const [endYear, setEndYear] = useState(new Date().getFullYear());
+const DataQueryPage = (): JSX.Element => {
+  const [startYear, setStartYear] = useState<number>(2004);
+  const [endYear, setEndYear] = useState<number>(new Date().getFullYear());
   const [dataSource, setDataSource] = useState<'web' | 'api'>('web');
-  const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>('');
+  const [error, setError] = useState<string>('');
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setIsLoading(true);
     setMessage('');

@@ -3,11 +3,11 @@ import { useRetirement } from '../context/RetirementContext';
 import { WithdrawalCalculation } from '../types';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const WithdrawalResults: React.FC = () => {
+const WithdrawalResults = (): JSX.Element => {
   const { withdrawalCalculations, calculateWithdrawals } = useRetirement();
-  const [years, setYears] = useState(30);
+  const [years, setYears] = useState<number>(30);
   
-  const handleCalculate = () => {
+  const handleCalculate = (): void => {
     calculateWithdrawals(years);
   };
   
@@ -90,7 +90,7 @@ const WithdrawalResults: React.FC = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="year" />
                 <YAxis />
-                <Tooltip formatter={(value: number) => formatCurrency(Number(value))} />
+                <Tooltip formatter={(value: number) => formatCurrency(value)} />
                 <Legend />
                 <Line type="monotone" dataKey="portfolioValue" name="Portfolio Value" stroke="#0078d4" activeDot={{ r: 8 }} />
                 <Line type="monotone" dataKey="withdrawalAmount" name="Withdrawal Amount" stroke="#5c2d91" />

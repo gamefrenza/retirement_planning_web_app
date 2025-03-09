@@ -5,23 +5,13 @@ import {
   WithdrawalStrategy, 
   WithdrawalRule,
   WithdrawalCalculation,
-  MarketData
+  MarketData,
+  RetirementContextType,
+  ReactNodeType
 } from '../types';
 import { getMarketData } from '../utils/api';
 
-interface RetirementContextType {
-  assets: RetirementAssets;
-  setAssets: (assets: RetirementAssets) => void;
-  withdrawalStrategy: WithdrawalStrategy;
-  setWithdrawalStrategy: (strategy: WithdrawalStrategy) => void;
-  withdrawalCalculations: WithdrawalCalculation[];
-  setWithdrawalCalculations: (calculations: WithdrawalCalculation[]) => void;
-  calculateWithdrawals: (years: number) => void;
-  marketData: MarketData[];
-  isLoading: boolean;
-  error: string | null;
-}
-
+// Default values
 const defaultAssetAllocation: AssetAllocation = {
   cash: 10,
   bonds: 40,
@@ -34,9 +24,9 @@ const defaultRetirementAssets: RetirementAssets = {
 };
 
 const defaultWithdrawalRules: WithdrawalRule[] = [
-  { marketReturnThreshold: 5, withdrawalRate: 4 },
-  { marketReturnThreshold: 0, withdrawalRate: 3 },
-  { marketReturnThreshold: -100, withdrawalRate: 2.5 }
+  { threshold: 5, rate: 4 },
+  { threshold: 0, rate: 3 },
+  { threshold: -100, rate: 2.5 }
 ];
 
 const defaultWithdrawalStrategy: WithdrawalStrategy = {
@@ -45,9 +35,10 @@ const defaultWithdrawalStrategy: WithdrawalStrategy = {
 };
 
 interface RetirementProviderProps {
-  children: React.ReactNode;
+  children: ReactNodeType;
 }
 
+// Create context with proper typing
 const RetirementContext = createContext<RetirementContextType | undefined>(undefined);
 
 export const useRetirement = (): RetirementContextType => {
@@ -58,12 +49,12 @@ export const useRetirement = (): RetirementContextType => {
   return context;
 };
 
-export const RetirementProvider: React.FC<RetirementProviderProps> = ({ children }) => {
-  const [assets, setAssets] = useState(defaultRetirementAssets);
-  const [withdrawalStrategy, setWithdrawalStrategy] = useState(defaultWithdrawalStrategy);
+export const RetirementProvider = ({ children }: RetirementProviderProps): JSX.Element => {
+  const [assets, setAssets] = useState<RetirementAssets>(defaultRetirementAssets);
+  const [withdrawalStrategy, setWithdrawalStrategy] = useState<WithdrawalStrategy>(defaultWithdrawalStrategy);
   const [withdrawalCalculations, setWithdrawalCalculations] = useState<WithdrawalCalculation[]>([]);
   const [marketData, setMarketData] = useState<MarketData[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -95,16 +86,10 @@ export const RetirementProvider: React.FC<RetirementProviderProps> = ({ children
   }, []);
 
   const calculateWithdrawals = (years: number): void => {
-    // ... existing calculation logic ...
-    const calculations: WithdrawalCalculation[] = [];
-    
     // Start with initial portfolio allocation
     let currentPortfolioValue = assets.totalAmount;
-    let currentCash = assets.totalAmount * (assets.allocation.cash / 100);
-    let currentBonds = assets.totalAmount * (assets.allocation.bonds / 100);
-    let currentEquity = assets.totalAmount * (assets.allocation.equity / 100);
-    
     const currentYear = new Date().getFullYear();
+    const calculations: WithdrawalCalculation[] = [];
     
     for (let i = 0; i < years; i++) {
       const year = currentYear + i;
@@ -114,7 +99,7 @@ export const RetirementProvider: React.FC<RetirementProviderProps> = ({ children
       let inflationRate: number;
       
       // Try to find historical data for past years
-      const historicalData = marketData.find((data: MarketData) => data.year === year);
+      const historicalData = marketData.find(data => data.year === year);
       
       if (historicalData && historicalData.sp500Return !== null && historicalData.inflationRate !== null) {
         // Use historical data
@@ -123,16 +108,27 @@ export const RetirementProvider: React.FC<RetirementProviderProps> = ({ children
       } else {
         // For future years, use average of historical data (2004-2024)
         const historicalReturns = marketData
-          .filter((data: MarketData) => data.sp500Return !== null)
-          .map((data: MarketData) => data.sp500Return as number);
+          .filter(data => data.sp500Return !== null)
+          .map(data => data.sp500Return as number);
         
         const historicalInflation = marketData
-          .filter((data: MarketData) => data.inflationRate !== null)
-          .map((data: MarketData) => data.inflationRate as number);
+          .filter(data => data.inflationRate !== null)
+          .map(data => data.inflationRate as number);
         
-        // Calculate averages
-        const avgReturn = historicalReturns.reduce((sum, val) => sum + val, 0) / historicalReturns.length;
-        const avgInflation = historicalInflation.reduce((sum, val) => sum + val, 0) / historicalInflation.length;
+        // Calculate averages (excluding extreme outliers)
+        const sortedReturns = [...historicalReturns].sort((a, b) => a - b);
+        const sortedInflation = [...historicalInflation].sort((a, b) => a - b);
+        
+        // Remove top and bottom 10% if enough data points
+        const trimStart = Math.floor(sortedReturns.length * 0.1);
+        const trimEnd = Math.ceil(sortedReturns.length * 0.9);
+        
+        const trimmedReturns = sortedReturns.slice(trimStart, trimEnd);
+        const trimmedInflation = sortedInflation.slice(trimStart, trimEnd);
+        
+        // Calculate averages of trimmed data
+        const avgReturn = trimmedReturns.reduce((sum, val) => sum + val, 0) / trimmedReturns.length;
+        const avgInflation = trimmedInflation.reduce((sum, val) => sum + val, 0) / trimmedInflation.length;
         
         // Add some randomness around the average
         marketReturn = avgReturn + (Math.random() * 10 - 5); // Average ±5%
@@ -142,8 +138,8 @@ export const RetirementProvider: React.FC<RetirementProviderProps> = ({ children
       // Determine withdrawal rate based on market return
       let withdrawalRate = withdrawalStrategy.defaultRate;
       for (const rule of withdrawalStrategy.rules) {
-        if (marketReturn >= rule.marketReturnThreshold) {
-          withdrawalRate = rule.withdrawalRate;
+        if (marketReturn >= rule.threshold) {
+          withdrawalRate = rule.rate;
           break;
         }
       }
@@ -151,25 +147,22 @@ export const RetirementProvider: React.FC<RetirementProviderProps> = ({ children
       // Calculate withdrawal amount
       const withdrawalAmount = (currentPortfolioValue * withdrawalRate) / 100;
       
-      // Simple withdrawal calculation for demo
-      const remainingPortfolio = currentPortfolioValue - withdrawalAmount;
+      // Calculate inflation-adjusted withdrawal
+      const inflationAdjustedWithdrawal = withdrawalAmount * (1 + inflationRate / 100);
       
       // Add to calculations
       calculations.push({
         year,
-        portfolioValue: currentPortfolioValue,
         marketReturn,
         inflationRate,
         withdrawalRate,
         withdrawalAmount,
-        remainingPortfolio,
-        cashWithdrawal: withdrawalAmount * (assets.allocation.cash / 100),
-        bondsWithdrawal: withdrawalAmount * (assets.allocation.bonds / 100),
-        equityWithdrawal: withdrawalAmount * (assets.allocation.equity / 100)
+        portfolioValue: currentPortfolioValue,
+        inflationAdjustedWithdrawal
       });
       
       // Update portfolio value for next year
-      currentPortfolioValue = remainingPortfolio * (1 + marketReturn / 100);
+      currentPortfolioValue = (currentPortfolioValue - withdrawalAmount) * (1 + marketReturn / 100);
     }
     
     setWithdrawalCalculations(calculations);
@@ -181,7 +174,6 @@ export const RetirementProvider: React.FC<RetirementProviderProps> = ({ children
     withdrawalStrategy,
     setWithdrawalStrategy,
     withdrawalCalculations,
-    setWithdrawalCalculations,
     calculateWithdrawals,
     marketData,
     isLoading,
