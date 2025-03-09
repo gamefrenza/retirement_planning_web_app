@@ -4,7 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 
 const MarketDataChart = (): JSX.Element => {
   const { marketData, isLoading } = useRetirement();
-  const [timeRange, setTimeRange] = useState<number>(10); // Default to 10 years
+  const [timeRange, setTimeRange] = useState(10); // Default to 10 years
 
   if (isLoading || marketData.length === 0) {
     return (

@@ -5,7 +5,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 
 const WithdrawalResults = (): JSX.Element => {
   const { withdrawalCalculations, calculateWithdrawals } = useRetirement();
-  const [years, setYears] = useState<number>(30);
+  const [years, setYears] = useState(30);
   
   const handleCalculate = (): void => {
     calculateWithdrawals(years);
@@ -18,6 +18,11 @@ const WithdrawalResults = (): JSX.Element => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(value);
+  };
+  
+  // Custom formatter for tooltip that handles any type of value
+  const tooltipFormatter = (value: any): string => {
+    return formatCurrency(Number(value));
   };
   
   return (
@@ -90,7 +95,7 @@ const WithdrawalResults = (): JSX.Element => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="year" />
                 <YAxis />
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                <Tooltip formatter={tooltipFormatter} />
                 <Legend />
                 <Line type="monotone" dataKey="portfolioValue" name="Portfolio Value" stroke="#0078d4" activeDot={{ r: 8 }} />
                 <Line type="monotone" dataKey="withdrawalAmount" name="Withdrawal Amount" stroke="#5c2d91" />

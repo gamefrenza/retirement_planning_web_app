@@ -2,22 +2,19 @@
 
 import React from 'react';
 
-// Re-export React types to make them available throughout the app
-export type FormEventType = React.FormEvent<HTMLFormElement>;
-export type ReactNodeType = React.ReactNode;
-
-// Declare module augmentations for React
-declare module 'react' {
-  // Ensure useState is properly typed
-  export function useState<T>(initialState: T | (() => T)): [T, React.Dispatch<React.SetStateAction<T>>];
-  
-  // Ensure createContext is properly typed
-  export function createContext<T>(defaultValue: T): React.Context<T>;
-}
-
 // Extend window interface for custom properties
 declare global {
   interface Window {
     appLoadTimeout?: number;
   }
-} 
+}
+
+// Common React type exports
+export type FormEventType = React.FormEvent<HTMLFormElement>;
+export type ChangeEventType<T = HTMLInputElement> = React.ChangeEvent<T>;
+export type ReactNodeType = React.ReactNode;
+export type FC<P = {}> = React.FC<P>;
+export type FormEvent = React.FormEvent<HTMLFormElement>;
+
+// Ensure this is treated as a module
+export {}; 

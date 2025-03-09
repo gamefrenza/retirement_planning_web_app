@@ -5,11 +5,11 @@ import { RetirementAssets, AssetAllocation } from '../types';
 const AssetAllocationForm = (): JSX.Element => {
   const { assets, setAssets } = useRetirement();
   
-  const [totalAmount, setTotalAmount] = useState<number>(assets.totalAmount);
-  const [cashPercentage, setCashPercentage] = useState<number>(assets.allocation.cash);
-  const [bondsPercentage, setBondsPercentage] = useState<number>(assets.allocation.bonds);
-  const [equityPercentage, setEquityPercentage] = useState<number>(assets.allocation.equity);
-  const [error, setError] = useState<string>('');
+  const [totalAmount, setTotalAmount] = useState(assets.totalAmount);
+  const [cashPercentage, setCashPercentage] = useState(assets.allocation.cash);
+  const [bondsPercentage, setBondsPercentage] = useState(assets.allocation.bonds);
+  const [equityPercentage, setEquityPercentage] = useState(assets.allocation.equity);
+  const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();

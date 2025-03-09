@@ -6,8 +6,7 @@ import {
   WithdrawalRule,
   WithdrawalCalculation,
   MarketData,
-  RetirementContextType,
-  ReactNodeType
+  RetirementContextType
 } from '../types';
 import { getMarketData } from '../utils/api';
 
@@ -35,7 +34,7 @@ const defaultWithdrawalStrategy: WithdrawalStrategy = {
 };
 
 interface RetirementProviderProps {
-  children: ReactNodeType;
+  children: React.ReactNode;
 }
 
 // Create context with proper typing
@@ -50,11 +49,11 @@ export const useRetirement = (): RetirementContextType => {
 };
 
 export const RetirementProvider = ({ children }: RetirementProviderProps): JSX.Element => {
-  const [assets, setAssets] = useState<RetirementAssets>(defaultRetirementAssets);
-  const [withdrawalStrategy, setWithdrawalStrategy] = useState<WithdrawalStrategy>(defaultWithdrawalStrategy);
+  const [assets, setAssets] = useState(defaultRetirementAssets);
+  const [withdrawalStrategy, setWithdrawalStrategy] = useState(defaultWithdrawalStrategy);
   const [withdrawalCalculations, setWithdrawalCalculations] = useState<WithdrawalCalculation[]>([]);
   const [marketData, setMarketData] = useState<MarketData[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {

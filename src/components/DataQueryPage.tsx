@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { updateMarketData } from '../utils/api';
 
 const DataQueryPage = (): JSX.Element => {
-  const [startYear, setStartYear] = useState<number>(2004);
-  const [endYear, setEndYear] = useState<number>(new Date().getFullYear());
-  const [dataSource, setDataSource] = useState<'web' | 'api'>('web');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [message, setMessage] = useState<string>('');
-  const [error, setError] = useState<string>('');
+  const [startYear, setStartYear] = useState(2004);
+  const [endYear, setEndYear] = useState(new Date().getFullYear());
+  const [dataSource, setDataSource] = useState('web' as 'web' | 'api');
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -52,7 +52,7 @@ const DataQueryPage = (): JSX.Element => {
               type="number"
               id="startYear"
               value={startYear}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStartYear(Number(e.target.value))}
+              onChange={(e) => setStartYear(Number(e.target.value))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               min="1900"
               max={endYear}
@@ -68,7 +68,7 @@ const DataQueryPage = (): JSX.Element => {
               type="number"
               id="endYear"
               value={endYear}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEndYear(Number(e.target.value))}
+              onChange={(e) => setEndYear(Number(e.target.value))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               min={startYear}
               max={new Date().getFullYear()}
@@ -83,7 +83,7 @@ const DataQueryPage = (): JSX.Element => {
             <select
               id="dataSource"
               value={dataSource}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setDataSource(e.target.value as 'web' | 'api')}
+              onChange={(e) => setDataSource(e.target.value as 'web' | 'api')}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               required
             >
