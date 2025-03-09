@@ -123,7 +123,7 @@ cd client
 npm start
 ```
 
-4. Open your browser and navigate to `http://localhost:3000`
+4. Open your browser and navigate to `http://localhost:5000`
 
 ## Usage
 
