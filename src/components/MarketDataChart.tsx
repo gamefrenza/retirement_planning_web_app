@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useRetirement } from '../context/RetirementContext';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const MarketDataChart = (): JSX.Element => {
+const MarketDataChart: React.FC = () => {
   const { marketData, isLoading } = useRetirement();
   const [timeRange, setTimeRange] = useState(10); // Default to 10 years
 
@@ -10,7 +10,7 @@ const MarketDataChart = (): JSX.Element => {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-semibold mb-4">Market Data</h2>
-        <p>Loading market data...</p>
+        <p className="text-gray-600">Loading market data...</p>
       </div>
     );
   }
@@ -29,10 +29,10 @@ const MarketDataChart = (): JSX.Element => {
         <input
           type="range"
           id="timeRange"
-          min="1"
+          min={1}
           max={Math.min(20, marketData.length)}
           value={timeRange}
-          onChange={(e) => setTimeRange(Number(e.target.value))}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTimeRange(Number(e.target.value))}
           className="w-full"
         />
         <div className="flex justify-between text-sm text-gray-600">

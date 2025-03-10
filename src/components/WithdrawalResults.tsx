@@ -3,7 +3,7 @@ import { useRetirement } from '../context/RetirementContext';
 import { WithdrawalCalculation } from '../types';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const WithdrawalResults = (): JSX.Element => {
+const WithdrawalResults: React.FC = () => {
   const { withdrawalCalculations, calculateWithdrawals } = useRetirement();
   const [years, setYears] = useState(30);
   
@@ -20,8 +20,7 @@ const WithdrawalResults = (): JSX.Element => {
     }).format(value);
   };
   
-  // Custom formatter for tooltip that handles any type of value
-  const tooltipFormatter = (value: any): string => {
+  const tooltipFormatter = (value: number | string): string => {
     return formatCurrency(Number(value));
   };
   
@@ -39,10 +38,10 @@ const WithdrawalResults = (): JSX.Element => {
               type="number"
               id="years"
               value={years}
-              onChange={(e) => setYears(Number(e.target.value))}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setYears(Number(e.target.value))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              min="1"
-              max="50"
+              min={1}
+              max={50}
               required
             />
           </div>
